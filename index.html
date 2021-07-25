@@ -1,19 +1,275 @@
 <!DOCTYPE html>
 <html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <script src="script.js" defer></script>
+        <title>Lab 04</title>
+        <link
+            href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css"
+            rel="stylesheet"
+        />
+    </head>
+    <style>
+        ul li {
+            cursor: pointer;
+            position: relative;
+            padding: 12px 8px 12px 40px;
+            list-style-type: none;
+            background: #eee;
+            font-size: 18px;
+            transition: 0.2s;
+        }
+        /* Style the done button */
+        .donebutton {
+            background-color: #4caf50;
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin-left: 400px;
+        }
 
-<head>
-	<meta charset="UTF-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<script src='script.js' defer></script>
-	<title>Lab 04</title>
-	<!-- <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet"> -->
-</head>
+        /* Style the close button */
+        .deletebutton {
+            background-color: #e20202;
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+        }
 
-<body>
-	<h1>Minimal Todo List</h1>
-	<input  type='text'>
-	<button>+</button>
-</body>
+        ul li.checked {
+            background: #888;
+            color: #fff;
+            text-decoration: line-through;
+        }
 
+        /* Add a "checked" mark when clicked on */
+        ul li.checked::before {
+            content: "";
+            position: absolute;
+            border-color: #fff;
+            border-style: solid;
+            border-width: 0 2px 2px 0;
+            top: 10px;
+            left: 16px;
+            transform: rotate(45deg);
+            height: 15px;
+            width: 7px;
+        }
+    </style>
+    <body>
+        <div
+            class="bg-auto  bg-cover bg-no-repeat"
+            style="background-image: url(./img/pic2.jpg)"
+        >
+            <br /><br /><br />
+            <div class="text-center text-xl font-semibold">
+                Minimal Todo list
+            </div>
+            <br /><br /><br />
+            <div class = "flex justify-center ">
+            <input class = "w-1/4"type="text" id="myTodo" placeholder="Todo..." />
+            <button
+                onclick="myOnClick()"
+                class="
+                    bg-gray-700
+                    hover:bg-gray-600
+                    text-white
+                    font-bold
+                    py-4
+                    px-12
+                    rounded
+                    bg-opacity-75
+                ">
+                Add
+            </button>
+            </div>
+            <br /><br /><br />
+            <p id="myTodoList"></p>
+            <div class="space-y-10">
+                <div
+                    class="
+                        bg-white
+                        max-w-screen-md
+                        mx-auto
+                        shadow-lg
+                        rounded-xl
+                        ring-1 ring-gray-300
+                        bg-opacity-50
+                    "
+                >
+                    <div class="flex p-4">
+                        <ul class = "w-full " id="myList"></ul>
+                    </div>
+                </div>
+                <br />
+            </div>
+            <div class="text-white text-center my-60">Copyright © 2021 Zenstagram.com by Yanatib Bhoosawang </div>
+            <br /><br /><br /><br />
+        </div>
+        <script>
+            function onClickDoneButton(event) {
+                let target = getEventTarget(event);
+                let li = target.closest("li");
+                li.classList.toggle("checked");
+            }
+
+            function onClickDeleteButton(event) {
+                let target = getEventTarget(event);
+                let li = target.closest("li"); // get reference by using closest
+                let ul = li.closest("ul");
+                let nodes = Array.from(li.closest("ul").children); // get array
+                let index = nodes.indexOf(li);
+
+                ul.removeChild(li);
+
+                arrlist = JSON.parse(localStorage.getItem("myTodo"));
+                if (arrlist == null) {
+                    arrlist = [];
+                }
+                arrlist.splice(arrlist.length - index - 1, 1);
+                localStorage.setItem("myTodo", JSON.stringify(arrlist));
+            }
+
+            function getEventTarget(e) {
+                e = e || window.event;
+                return e.target || e.srcElement;
+            }
+
+            var arrlist = JSON.parse(localStorage.getItem("myTodo"));
+            if (arrlist == null) {
+                arrlist = [];
+            }
+
+            for (let i = 0; i < arrlist.length; i++) {
+                var list = document.createElement("Li");
+                var text = document.createTextNode(arrlist[i]);
+                list.appendChild(text);
+
+                var myList = document.getElementById("myList");
+                myList.insertBefore(list, myList.childNodes[0]);
+
+                //Create a "done" button
+                var doneButton = document.createElement("BUTTON");
+                doneButton.textContent = "DONE";
+                doneButton.className = "donebutton";
+
+                // Create a "close" button
+                var deleteButton = document.createElement("BUTTON");
+                deleteButton.textContent = "DEL";
+                deleteButton.className = "deletebutton";
+
+                doneButton.onclick = function (event) {
+                    onClickDoneButton();
+                };
+
+                deleteButton.onclick = function (event) {
+                    onClickDeleteButton();
+                };
+                list.appendChild(doneButton);
+                doneButton.style.visibility = "hidden";
+                list.appendChild(deleteButton);
+                deleteButton.style.visibility = "hidden";
+                list.onmouseenter = function (event) {
+                    var list0 = event.target;
+                    var children = list0.childNodes;
+                    for (var i = 0, len = children.length; i < len; i++) {
+                        //alert('i=' + i + ' ' + children[i]);
+                        if (i > 0) {
+                            children[i].style.visibility = "visible";
+                        }
+                    }
+                };
+                list.onmouseleave = function (event) {
+                    var list0 = event.target;
+                    var children = list0.childNodes;
+                    for (var i = 0, len = children.length; i < len; i++) {
+                        //alert('i=' + i + ' ' + children[i]);
+                        if (i > 0) {
+                            children[i].style.visibility = "hidden";
+                        }
+                    }
+                };
+            }
+            var input = document.getElementById("myTodo");
+            input.addEventListener("keyup", function (event) {
+                // Number 13 is the "Enter" key on the keyboard
+                if (event.keyCode === 13) {
+                    // Cancel the default action, if needed
+                    event.preventDefault();
+                    myOnClick();
+                }
+            });
+
+            //addtolist
+            function myOnClick() {
+                var inputValue = document.getElementById("myTodo").value;
+                document.getElementById("myTodo").value = "";
+                if (inputValue === "") {
+                    alert("Task cannot be empty");
+                } else {
+                    var list = document.createElement("Li");
+                    var text = document.createTextNode(inputValue);
+                    list.appendChild(text);
+
+                    var myList = document.getElementById("myList");
+                    myList.insertBefore(list, myList.childNodes[0]);
+
+                    arrlist.push(inputValue);
+
+                    //Create a "done" button
+                    var doneButton = document.createElement("BUTTON");
+                    doneButton.textContent = "DONE";
+                    doneButton.className = "donebutton";
+
+                    // Create a "close" button
+                    var deleteButton = document.createElement("BUTTON");
+                    deleteButton.textContent = "DEL";
+                    deleteButton.className = "deletebutton";
+
+                    doneButton.onclick = function (event) {
+                        onClickDoneButton();
+                    };
+
+                    deleteButton.onclick = function (event) {
+                        onClickDeleteButton();
+                    };
+                    list.appendChild(doneButton);
+                    doneButton.style.visibility = "hidden";
+                    list.appendChild(deleteButton);
+                    deleteButton.style.visibility = "hidden";
+                    list.onmouseenter = function (event) {
+                        var list0 = event.target;
+                        var children = list0.childNodes;
+                        for (var i = 0, len = children.length; i < len; i++) {
+                            //alert('i=' + i + ' ' + children[i]);
+                            if (i > 0) {
+                                children[i].style.visibility = "visible";
+                            }
+                        }
+                    };
+                    list.onmouseleave = function (event) {
+                        var list0 = event.target;
+                        var children = list0.childNodes;
+                        for (var i = 0, len = children.length; i < len; i++) {
+                            //alert('i=' + i + ' ' + children[i]);
+                            if (i > 0) {
+                                children[i].style.visibility = "hidden";
+                            }
+                        }
+                    };
+                }
+                localStorage.setItem("myTodo", JSON.stringify(arrlist));
+            }
+        </script>
+    </body>
 </html>
